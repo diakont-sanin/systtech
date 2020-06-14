@@ -1,0 +1,103 @@
+-
+    const result = data.reduce((acc, cur)=> {
+    const date = cur.date.substring(0, 10)
+    acc[date] = acc[date] || []
+    acc[date].push(cur)
+    return acc
+    }, {})
+
+    const getUnique = (arr) => {
+    let i = 0,
+        current,
+        length = arr.length,
+        unique = []
+    for (; i < length; i++) {
+        current = arr[i]
+        if (!~unique.indexOf(current)) {
+        unique.push(current)
+        }
+    }
+    return unique
+    }
+
+    const getGroupDocs = (array) => {
+    const arr = []
+    const filtered = array.reduce((acc, curr) =>{
+        acc[curr.numdoc] = acc[curr.numdoc] || []
+        acc[curr.numdoc].push(curr)
+        return acc
+    }, {})
+
+    for (let i in filtered) {
+        const doctype = getUnique(filtered[i].map((item) => item.doctype))
+        const sum = filtered[i]
+        .map((item) => item.price * item.quantity)
+        .reduce((acc, cur) => acc + cur)
+        arr.push({
+        numdoc: i,
+        data: filtered[i],
+        doctype,
+        sum,
+        })
+    }
+    return arr
+    }
+
+    const array = []
+
+    for (let date in result) {
+    const numdocs = getUnique(result[date].map((item) => item.numdoc))
+    const sum = result[date]
+        .map((item) => item.price * item.quantity)
+        .reduce((acc, cur) => acc + cur)
+    array.push({
+        date,
+        count: numdocs.length,
+        sum,
+        items: getGroupDocs(result[date]),
+    })
+    }
+
+    const formatPrice = (price) => {
+    return Number(price).toLocaleString('ru', {
+        style: 'currency',
+        currency: 'RUB',
+    })
+    }
+
+    const formatDate = (date) => {
+    const options = { day: 'numeric', month: 'long' }
+    return new Date(date).toLocaleString('ru-RU', options)
+    }
+   
+        
+    
+
+
+each head,index in array
+    .main
+        ul#compositions-list.pure-tree.main-tree
+            li 
+                input(type="checkbox",id="trigger-views"+index)
+                label(for="trigger-views"+index) #{formatDate(head.date)}
+                    .countdocs Документов: #{head.count} (#{formatPrice(head.sum)})
+                each doc, index in head.items
+                    ul.pure-tree
+                        li
+                            .doctype
+                                div #{doc.doctype} №#{doc.numdoc}
+                                div #{formatPrice(doc.sum)}
+                            input(type="checkbox",id="trigger-layout"+doc.numdoc) 
+                            label(for="trigger-layout"+doc.numdoc, id="collapse") Товаров: #{doc.data.length}
+                            each item in doc.data
+                                ul.pure-tree
+                                    li
+                                        .itemlist
+                                            img(src=item.image||'', alt=item.name, class="label", onerror="this.src='http://p91112bc.beget.tech/systech/no_image.a26de6b3.jpg'")
+                                            .item-text #{item.name}
+                                                .item-sum 
+                                                    .item-sum #{item.quantity} штук x #{item.price} ₽
+                                                    .item-sum #{formatPrice(item.price * item.quantity)}
+
+
+
