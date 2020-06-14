@@ -1,5 +1,5 @@
 -
-    const result = data.reduce((acc, cur)=> {
+    const groupDate = data.reduce((acc, cur)=> {
     const date = cur.date.substring(0, 10)
     acc[date] = acc[date] || []
     acc[date].push(cur)
@@ -20,7 +20,7 @@
     return unique
     }
 
-    const getGroupDocs = (array) => {
+    const groupByDocs = (array) => {
     const arr = []
     const filtered = array.reduce((acc, curr) =>{
         acc[curr.numdoc] = acc[curr.numdoc] || []
@@ -45,16 +45,16 @@
 
     const array = []
 
-    for (let date in result) {
-    const numdocs = getUnique(result[date].map((item) => item.numdoc))
-    const sum = result[date]
+    for (let date in groupDate) {
+    const numdocs = getUnique(groupDate[date].map((item) => item.numdoc))
+    const sum = groupDate[date]
         .map((item) => item.price * item.quantity)
         .reduce((acc, cur) => acc + cur)
     array.push({
         date,
         count: numdocs.length,
         sum,
-        items: getGroupDocs(result[date]),
+        items: groupByDocs(groupDate[date]),
     })
     }
 
